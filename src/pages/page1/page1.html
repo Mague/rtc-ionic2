@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Page One</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h3>Chicho es un LOQUITO</h3>
+  <div id="body">
+    <!--<video class="e2e-iframe-untrusted-src" [src]="lStream"></video>-->
+    
+    <div id="local">
+      <video autoplay *ngFor="let uri of local">
+        <source [src]="uri" type="video/mp4" />
+      </video>
+    </div>
+    <div id="remote"></div>
+  </div>
+  <!--<button ion-button secondary menuToggle>Toggle Menu</button>-->
+  <button ion-button round (click)="iniciar()">Iniciar</button>
+</ion-content>
