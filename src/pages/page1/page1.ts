@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,NgZone } from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import { NavController } from 'ionic-angular';
 
@@ -27,13 +27,21 @@ export class Page1 {
   remote = crel('div', { class: 'remote' })
   remotos = []
   local = []
+  localStream = []
   sanador: any
-  
+  idLocal: any
+  signaller: any
   constructor(public navCtrl: NavController,private sanitizer: DomSanitizer) {
     // this.connect()
     // console.log(this.plugins)
     this.sanador = sanitizer
     this.camera = false
+    this.socket = io("https://192.168.0.109:3000")
+      this.socket.on('connect', () => {
+        // alert("lol")
+      })
+      // console.log(localStream)
+      this.signaller = require('rtc-signaller-socket.io')(this.socket)
   }
 
   connect(): void {
@@ -47,9 +55,13 @@ export class Page1 {
       // render the local media
       // console.log(this.plugins)
       // console.log(self.plugins)
-      var URL = typeof window != 'undefined' && window.URL;
       
-      attach(localStream, { plugins: self.plugins }, function (err, el) {
+      var URL = typeof window != 'undefined' && window.URL;
+      if(self.localStream.length==0){
+        self.lStream=localStream
+        self.localStream.push(self.lStream)
+      }
+      attach(self.localStream[0], { plugins: self.plugins }, function (err, el) {
         // self.local=el;
         console.log(el)
         let aux=URL.createObjectURL(localStream).toString();
@@ -61,24 +73,19 @@ export class Page1 {
 
         },100)
       });
-      self.socket = io("https://192.168.0.109:3000")
-      self.socket.on('connect', () => {
-        // alert("lol")
-      })
-      // console.log(localStream)
-      var signaller = require('rtc-signaller-socket.io')(self.socket)
+      
       // console.log(signaller)
       // signaller(self.socket);
 
       // initiate connection
       
-      require('rtc-quickconnect')(signaller, {
+      require('rtc-quickconnect')(self.signaller, {
         iceServers: require('freeice')(),
         room: 'test-room',
         plugins: self.plugins
       })
         // broadcast our captured media to other participants in the room
-        .addStream(localStream)
+        .addStream(self.localStream[0])
         .on('channel:opened:test', function (id, dc) {
           //alert("channel:opened:test")
           console.log('data channel opened with peer: ' + id);
@@ -86,6 +93,7 @@ export class Page1 {
         // when a peer is connected (and active) pass it to us for use
         .on('call:started', function (id, pc, data) {
           //alert("call:started")
+          self.idLocal=id
           console.log(pc)
           var pcs = pc.getRemoteStreams();
           for (var i = 0; i < pcs.length; i++) {
@@ -105,6 +113,7 @@ export class Page1 {
           //alert("call:ended")
           qsa('*[data-peer="' + id + '"]', self.remote).forEach(function (el) {
             el.parentNode.removeChild(el);
+            console.log("Removiendo")
           });
         });
     });

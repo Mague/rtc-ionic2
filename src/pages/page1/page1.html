@@ -8,17 +8,15 @@
 </ion-header>
 
 <ion-content padding>
-  <h3>Chicho es un LOQUITO</h3>
-  <div id="body">
-    <!--<video class="e2e-iframe-untrusted-src" [src]="lStream"></video>-->
-    
-    <div id="local">
-      <video autoplay *ngFor="let uri of local">
-        <source [src]="uri" type="video/mp4" />
-      </video>
-    </div>
-    <div id="remote"></div>
-  </div>
-  <!--<button ion-button secondary menuToggle>Toggle Menu</button>-->
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12>
+        <!--<video autoplay *ngFor="let uri of local" style="">
+          <source [src]="uri" type="video/mp4" />
+        </video>-->
+        <video [src]="lStream" autoplay style="width: 100%"></video>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
   <button ion-button round (click)="iniciar()">Iniciar</button>
 </ion-content>
